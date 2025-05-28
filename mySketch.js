@@ -1,5 +1,6 @@
 let bgImg;
 let infoDiv = null;  // holds our popup
+let stars = [];  // array to hold star data
 
 // define your interactive zones here — note the new `info` field!
 const zones = [
@@ -43,11 +44,17 @@ function setup() {
   imageMode(CENTER);
   textSize(16);
   noStroke();
+  
+  // Initialize stars within the window area
+  initializeStars();
 }
 
 function draw() {
   background(0);
   image(bgImg, width/2, height/2, width, height);
+
+  // Draw flashing stars in the window area
+  drawStars();
 
   hoveredZone = null;
   cursor(ARROW);
@@ -121,4 +128,44 @@ function showInfoBox(title, message) {
     infoDiv.remove();
     infoDiv = null;
   });
+}
+
+// Initialize stars within the window area
+function initializeStars() {
+  const windowZone = zones.find(z => z.name === 'Window');
+  const numStars = 15; // Number of stars to create
+  
+  for (let i = 0; i < numStars; i++) {
+    stars.push({
+      x: random(windowZone.x - windowZone.w/2 + 20, windowZone.x + windowZone.w/2 - 20),
+      y: random(windowZone.y - windowZone.h/2 + 20, windowZone.y + windowZone.h/2 - 20),
+      size: random(2, 5),
+      brightness: random(100, 255),
+      flickerSpeed: random(0.02, 0.08),
+      phase: random(0, TWO_PI) // Different starting phase for each star
+    });
+  }
+}
+
+// Draw the flashing stars
+function drawStars() {
+  const windowZone = zones.find(z => z.name === 'Window');
+  
+  // Only draw stars if we're not hovering over the window (so they don't interfere with the red highlight)
+  if (!hoveredZone || hoveredZone.name !== 'Window') {
+    stars.forEach(star => {
+      // Calculate flashing brightness using sine wave
+      let currentBrightness = star.brightness + sin(frameCount * star.flickerSpeed + star.phase) * 50;
+      currentBrightness = constrain(currentBrightness, 50, 255);
+      
+      // Draw the star
+      noStroke();
+      fill(currentBrightness, currentBrightness, currentBrightness);
+      circle(star.x, star.y, star.size);
+      
+      // Add a subtle glow effect
+      fill(currentBrightness, currentBrightness, currentBrightness, 100);
+      circle(star.x, star.y, star.size * 2);
+    });
+  }
 }
