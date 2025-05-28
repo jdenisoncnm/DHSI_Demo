@@ -24,7 +24,7 @@ const zones = [
   },
   {
     name: 'Window',
-    x: 700, y: 350, w: 480, h: 350,
+    x: 800, y: 350, w: 480, h: 350,
     info: 'Beyond the window, you glimpse a distant starship—the final clue.',
     onClick: () => showInfoBox('Window', zones[3].info)
   }
