@@ -6,25 +6,25 @@ let stars = [];  // array to hold star data
 const zones = [
   {
     name: 'Desk Display',
-    x: 655, y: 600, w: 140, h: 90,
+    x: 775, y: 600, w: 140, h: 90,
     info: 'You spot a smudged fingerprint on the display—could it belong to the saboteur?',
     onClick: () => showInfoBox('Desk Display', zones[0].info)
   },
   {
     name: 'Keyboard',
-    x: 450, y: 700, w: 360, h: 60,
+    x: 520, y: 650, w: 120, h: 100,
     info: 'Tiny crumbs lodged between the keys hint someone ate here in a hurry.',
     onClick: () => showInfoBox('Keyboard', zones[1].info)
   },
   {
     name: 'Left Monitor',
-    x: 150, y: 220, w: 260, h: 160,
+    x: 150, y: 320, w: 260, h: 160,
     info: 'The left monitor still shows an unsent file: “top‐secret_mission.txt.”',
     onClick: () => showInfoBox('Left Monitor', zones[2].info)
   },
   {
     name: 'Window',
-    x: 800, y: 350, w: 480, h: 350,
+    x: 750, y: 320, w: 480, h: 350,
     info: 'Beyond the window, you glimpse a distant starship—the final clue.',
     onClick: () => showInfoBox('Window', zones[3].info)
   }
