@@ -11,7 +11,7 @@ const zones = [
     onClick: () => showInfoBox('Desk Display', zones[0].info)
   },
   {
-    name: 'Keyboard',
+    name: 'keypad',
     x: 520, y: 650, w: 120, h: 100,
     info: 'Tiny crumbs lodged between the keys hint someone ate here in a hurry.',
     onClick: () => showInfoBox('Keyboard', zones[1].info)
@@ -55,6 +55,9 @@ function draw() {
 
   // Draw flashing stars in the window area
   drawStars();
+  
+  // Draw blinking lights for left monitor
+  drawMonitorLights();
 
   hoveredZone = null;
   cursor(ARROW);
@@ -167,5 +170,52 @@ function drawStars() {
       fill(currentBrightness, currentBrightness, currentBrightness, 100);
       circle(star.x, star.y, star.size * 2);
     });
+  }
+}
+
+// Draw blinking blue and yellow lights for the left monitor
+function drawMonitorLights() {
+  const leftMonitor = zones.find(z => z.name === 'Left Monitor');
+  
+  // Only draw lights if we're not hovering over the monitor (so it doesn't interfere with red highlight)
+  if (!hoveredZone || hoveredZone.name !== 'Left Monitor') {
+    // Calculate blinking states using sine waves at different speeds
+    let blueIntensity = (sin(frameCount * 0.08) + 1) * 127.5; // Medium pace for blue
+    let yellowIntensity = (sin(frameCount * 0.12 + PI/3) + 1) * 127.5; // Slightly faster, offset phase for yellow
+    
+    // Create multiple indicator lights inside the monitor
+    noStroke();
+    
+    // Blue lights in the left area of monitor
+    fill(0, 100, 255, blueIntensity);
+    circle(leftMonitor.x - leftMonitor.w/2 + 30, leftMonitor.y - 50, 8);
+    circle(leftMonitor.x - leftMonitor.w/2 + 30, leftMonitor.y - 20, 8);
+    circle(leftMonitor.x - leftMonitor.w/2 + 30, leftMonitor.y + 10, 8);
+    circle(leftMonitor.x - leftMonitor.w/2 + 30, leftMonitor.y + 40, 8);
+    
+    // Yellow lights in the right area of monitor
+    fill(255, 255, 0, yellowIntensity);
+    circle(leftMonitor.x + leftMonitor.w/2 - 30, leftMonitor.y - 50, 8);
+    circle(leftMonitor.x + leftMonitor.w/2 - 30, leftMonitor.y - 20, 8);
+    circle(leftMonitor.x + leftMonitor.w/2 - 30, leftMonitor.y + 10, 8);
+    circle(leftMonitor.x + leftMonitor.w/2 - 30, leftMonitor.y + 40, 8);
+    
+    // Blue lights in the center-left
+    fill(0, 150, 255, blueIntensity * 0.8);
+    circle(leftMonitor.x - 40, leftMonitor.y - 30, 6);
+    circle(leftMonitor.x - 40, leftMonitor.y + 20, 6);
+    
+    // Yellow lights in the center-right
+    fill(255, 220, 0, yellowIntensity * 0.8);
+    circle(leftMonitor.x + 40, leftMonitor.y - 30, 6);
+    circle(leftMonitor.x + 40, leftMonitor.y + 20, 6);
+    
+    // Add a subtle screen glow effect
+    rectMode(CENTER);
+    noFill();
+    let screenGlow = (sin(frameCount * 0.05) + 1) * 30 + 20; // Slow pulsing glow
+    stroke(100, 200, 255, screenGlow);
+    strokeWeight(2);
+    rect(leftMonitor.x, leftMonitor.y, leftMonitor.w + 5, leftMonitor.h + 5);
   }
 }
