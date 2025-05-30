@@ -1,7 +1,8 @@
 let bgImg;
 let infoDiv = null;  // holds our popup
 let stars = [];  // array to hold star data
-let bgMusic;  // background music
+let bgMusic;  // background music (HTML5 Audio)
+let audioStarted = false;  // track if audio has been started by user interaction
 
 // define your interactive zones here — note the new `info` field!
 const zones = [
@@ -41,7 +42,29 @@ let hoveredZone = null;
 
 function preload() {
   bgImg = loadImage('office.jpg.png');
-  bgMusic = loadSound('Starship_Office_Jazz.wav');
+  
+  // Create HTML5 Audio element for better browser compatibility
+  bgMusic = new Audio('Starship_Office_Jazz.mp3');
+  bgMusic.loop = true;
+  bgMusic.volume = 0.3;
+  bgMusic.preload = 'auto';
+  
+  bgMusic.addEventListener('loadeddata', () => {
+    console.log('Background music loaded successfully');
+  });
+  
+  bgMusic.addEventListener('canplaythrough', () => {
+    console.log('Background music ready to play');
+  });
+  
+  bgMusic.addEventListener('error', (e) => {
+    console.error('Failed to load background music:', e);
+    console.error('Error details:', bgMusic.error);
+  });
+  
+  bgMusic.addEventListener('ended', () => {
+    console.log('Music ended - should loop automatically');
+  });
 }
 
 function setup() {
@@ -56,11 +79,8 @@ function setup() {
   // Initialize stars within the window area
   initializeStars();
   
-  // Start background music on loop
-  if (bgMusic) {
-    bgMusic.loop();
-    bgMusic.setVolume(0.3); // Set volume to 30% so it's not too loud
-  }
+  // Note: Audio will start on first user interaction due to browser autoplay policies
+  console.log('Setup complete. Click anywhere to start background music.');
 }
 
 function draw() {
@@ -114,12 +134,37 @@ function draw() {
   fill(255);
   noStroke();
   text(`x: ${mouseX}, y: ${mouseY}`, 10, height - 10);
+  
+  // Show audio status indicator
+  if (!audioStarted) {
+    fill(255, 255, 0);
+    text('🎵 Click anywhere to start background music', 10, 30);
+  } else if (bgMusic && !bgMusic.paused) {
+    fill(0, 255, 0);
+    text('♪ Background music playing', 10, 30);
+  } else if (audioStarted) {
+    fill(255, 100, 100);
+    text('🔇 Music paused - click to restart', 10, 30);
+  }
 }
 
 function mousePressed() {
-  // Start audio if it hasn't started yet (browsers require user interaction)
-  if (bgMusic && !bgMusic.isPlaying()) {
-    bgMusic.loop();
+  // Start audio on first user interaction (required by modern browsers)
+  if (bgMusic && !audioStarted) {
+    bgMusic.play().then(() => {
+      audioStarted = true;
+      console.log('Background music started successfully');
+    }).catch(error => {
+      console.error('Failed to start background music:', error);
+      console.error('Audio error details:', bgMusic.error);
+    });
+  } else if (bgMusic && audioStarted && bgMusic.paused) {
+    // Restart music if it was paused
+    bgMusic.play().then(() => {
+      console.log('Background music resumed');
+    }).catch(error => {
+      console.error('Failed to resume background music:', error);
+    });
   }
   
   if (hoveredZone) {
